@@ -8,11 +8,11 @@
     to sign assemblies. Strong naming provides a unique identity for the assembly.
 
 .PARAMETER KeyPath
-    The path where the key file should be created. Default is 'snglrtycrvtureofspce.Core.snk'
+    The path where the key file should be created. Default is 'Mistruna.Core.snk'
 
 .EXAMPLE
     ./GenerateKey.ps1
-    
+
 .EXAMPLE
     ./GenerateKey.ps1 -KeyPath "MyKey.snk"
 
@@ -23,7 +23,7 @@
 
 [CmdletBinding()]
 param(
-    [string]$KeyPath = "snglrtycrvtureofspce.Core.snk"
+    [string]$KeyPath = "Mistruna.Core.snk"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -44,10 +44,10 @@ Write-Host "Generating strong naming key..." -ForegroundColor Cyan
 try {
     # Try using the .NET SDK's built-in key generation
     $keyFullPath = Join-Path $PSScriptRoot $KeyPath
-    
+
     # Use sn.exe if available (Visual Studio Developer Command Prompt)
     $snExe = Get-Command "sn.exe" -ErrorAction SilentlyContinue
-    
+
     if ($snExe) {
         & sn.exe -k $keyFullPath
         if ($LASTEXITCODE -ne 0) {
@@ -57,24 +57,24 @@ try {
     else {
         # Fallback: Generate using .NET cryptography
         Add-Type -AssemblyName System.Security
-        
+
         $rsa = [System.Security.Cryptography.RSA]::Create(2048)
         $keyBlob = $rsa.ExportRSAPrivateKey()
-        
+
         # SNK format is a simple blob format
         # This creates a compatible strong name key
         [System.IO.File]::WriteAllBytes($keyFullPath, $keyBlob)
-        
+
         Write-Host "Note: Key generated using .NET cryptography. For production use, consider using Visual Studio's sn.exe tool." -ForegroundColor Yellow
     }
-    
+
     Write-Host ""
     Write-Host "Strong naming key generated successfully!" -ForegroundColor Green
     Write-Host "Key file: $keyFullPath" -ForegroundColor Gray
     Write-Host ""
     Write-Host "To enable strong naming, uncomment these lines in your .csproj files:" -ForegroundColor Cyan
     Write-Host '  <SignAssembly>true</SignAssembly>' -ForegroundColor White
-    Write-Host '  <AssemblyOriginatorKeyFile>..\..\snglrtycrvtureofspce.Core.snk</AssemblyOriginatorKeyFile>' -ForegroundColor White
+    Write-Host '  <AssemblyOriginatorKeyFile>..\..\Mistruna.Core.snk</AssemblyOriginatorKeyFile>' -ForegroundColor White
     Write-Host ""
     Write-Host "WARNING: Keep this key file secure! Do not commit it to public repositories." -ForegroundColor Red
 }

@@ -8,12 +8,12 @@
 
 ## Reporting a Vulnerability
 
-We take the security of snglrtycrvtureofspce.Core seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+We take the security of Mistruna.Core seriously. If you believe you have found a security vulnerability, please report it to us as described below.
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
 Instead, please report them by creating a private security advisory:
-1. Go to the [Security](https://github.com/snglrtycrvtureofspce/snglrtycrvtureofspce.Core/security) tab
+1. Go to the [Security](https://github.com/mistruna/Mistruna.Core/security) tab
 2. Click on "Report a vulnerability"
 3. Fill in the details
 

@@ -1,13 +1,13 @@
-# snglrtycrvtureofspce.Core
+# Mistruna.Core
 
-[![CI](https://github.com/snglrtycrvtureofspce/snglrtycrvtureofspce.Core/workflows/CI/badge.svg)](https://github.com/snglrtycrvtureofspce/snglrtycrvtureofspce.Core/actions?query=workflow%3ACI)
-[![NuGet](https://img.shields.io/nuget/v/snglrtycrvtureofspce.Core.svg)](https://www.nuget.org/packages/snglrtycrvtureofspce.Core)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/snglrtycrvtureofspce.Core.svg)](https://www.nuget.org/packages/snglrtycrvtureofspce.Core)
+[![CI](https://github.com/mistruna/Mistruna.Core/workflows/CI/badge.svg)](https://github.com/mistruna/Mistruna.Core/actions?query=workflow%3ACI)
+[![NuGet](https://img.shields.io/nuget/v/Mistruna.Core.svg)](https://www.nuget.org/packages/Mistruna.Core)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Mistruna.Core.svg)](https://www.nuget.org/packages/Mistruna.Core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Simple SDK for ASP.NET Core with built-in support for MediatR, FluentValidation, JWT authentication, RabbitMQ, and Swagger configuration.**
 
-[Getting Started](#installing-snglrtycrvtureofspcecore) •
+[Getting Started](#installing-mistrunacore) •
 [Features](#features) •
 [Documentation](#usage) •
 [Contributing](CONTRIBUTING.md)
@@ -29,18 +29,18 @@
 - 🧩 **Domain Events** - Event-driven architecture support
 - 🔄 **Specification Pattern** - Encapsulated query logic
 
-## Installing snglrtycrvtureofspce.Core
+## Installing Mistruna.Core
 
-You should install [snglrtycrvtureofspce.Core with NuGet](https://www.nuget.org/packages/snglrtycrvtureofspce.Core):
+You should install [Mistruna.Core with NuGet](https://www.nuget.org/packages/Mistruna.Core):
 
 ```powershell
-Install-Package snglrtycrvtureofspce.Core
+Install-Package Mistruna.Core
 ```
 
 Or via the .NET CLI:
 
 ```bash
-dotnet add package snglrtycrvtureofspce.Core
+dotnet add package Mistruna.Core
 ```
 
 ### Using Contracts-Only Package
@@ -48,7 +48,7 @@ dotnet add package snglrtycrvtureofspce.Core
 To reference only the contracts (interfaces) without the full implementation:
 
 ```powershell
-Install-Package snglrtycrvtureofspce.Core.Contracts
+Install-Package Mistruna.Core.Contracts
 ```
 
 This package is useful when:
@@ -316,9 +316,9 @@ services.AddSwaggerConfiguration();
 ## Project Structure
 
 ```
-snglrtycrvtureofspce.Core/
+Mistruna.Core/
 ├── src/
-│   ├── snglrtycrvtureofspce.Core/           # Main library
+│   ├── Mistruna.Core/           # Main library
 │   │   ├── Base/                            # Base types and responses
 │   │   ├── Enums/                           # Common enumerations
 │   │   ├── Errors/                          # Error handling utilities
@@ -329,9 +329,9 @@ snglrtycrvtureofspce.Core/
 │   │   ├── Microservices/                   # Microservices infrastructure
 │   │   ├── Middlewares/                     # ASP.NET Core middlewares
 │   │   └── Providers/                       # Test providers
-│   └── snglrtycrvtureofspce.Core.Contracts/ # Interfaces and contracts
+│   └── Mistruna.Core.Contracts/ # Interfaces and contracts
 ├── test/
-│   └── snglrtycrvtureofspce.Core.Tests/     # Unit tests
+│   └── Mistruna.Core.Tests/     # Unit tests
 ├── samples/                                  # Usage examples
 └── assets/                                   # Logo and assets
 ```

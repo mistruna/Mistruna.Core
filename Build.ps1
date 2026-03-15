@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Build script for snglrtycrvtureofspce.Core
+    Build script for Mistruna.Core
 
 .DESCRIPTION
     This script builds the solution in Release configuration and creates NuGet packages.
@@ -17,7 +17,7 @@
 
 .EXAMPLE
     ./Build.ps1
-    
+
 .EXAMPLE
     ./Build.ps1 -Configuration Debug -Clean
 #>
@@ -26,9 +26,9 @@
 param(
     [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Release',
-    
+
     [switch]$NoBuild,
-    
+
     [switch]$Clean
 )
 
@@ -36,7 +36,7 @@ $ErrorActionPreference = 'Stop'
 
 $artifacts = Join-Path $PSScriptRoot 'artifacts'
 
-Write-Host "Building snglrtycrvtureofspce.Core..." -ForegroundColor Cyan
+Write-Host "Building Mistruna.Core..." -ForegroundColor Cyan
 Write-Host "Configuration: $Configuration" -ForegroundColor Gray
 
 # Clean artifacts directory

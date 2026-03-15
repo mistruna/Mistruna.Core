@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Authors>Mistruna</Authors>
+    <Copyright>Copyright © Mistruna 2026</Copyright>
+    <PackageProjectUrl>https://github.com/mistruna/Mistruna.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mistruna/Mistruna.Core</RepositoryUrl>
+    <PackageTags>mistruna;asp.net;core;sdk;microservices</PackageTags>
+    <Company>Mistruna</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Mistruna.Core\Mistruna.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.1" />
+  </ItemGroup>
+
+</Project>

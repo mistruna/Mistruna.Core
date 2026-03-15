@@ -1,0 +1,71 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+
+# Solution folders
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3E1E8F48-6D0E-4F3E-A1B9-8C2A5B4D7E9F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4F2F9A59-7E1F-42A4-B2C0-9D3B6C5E8FA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5A3B0A6A-8F2A-43A5-C3D1-AE4C7D6F9AB1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6B4C1B7B-9A3B-54B6-D4E2-BF5D8E7A0BC2}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Build.ps1 = Build.ps1
+		BuildContracts.ps1 = BuildContracts.ps1
+		CONTRIBUTING.md = CONTRIBUTING.md
+		Directory.Build.props = Directory.Build.props
+		GenerateKey.ps1 = GenerateKey.ps1
+		LICENSE = LICENSE
+		NuGet.Config = NuGet.Config
+		Push.ps1 = Push.ps1
+		README.md = README.md
+		SECURITY.md = SECURITY.md
+	EndProjectSection
+EndProject
+
+# Projects
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mistruna.Core", "src\Mistruna.Core\Mistruna.Core.csproj", "{C16A8634-36D6-4353-B246-D6F43E49D92A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mistruna.Core.Contracts", "src\Mistruna.Core.Contracts\Mistruna.Core.Contracts.csproj", "{D27B9745-47E7-4464-C357-E7A54F5AE83B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mistruna.Core.Tests", "test\Mistruna.Core.Tests\Mistruna.Core.Tests.csproj", "{E38CA856-58F8-5575-D468-F8A65A6BF94C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mistruna.Core.Samples.BasicApi", "samples\Mistruna.Core.Samples.BasicApi\Mistruna.Core.Samples.BasicApi.csproj", "{F49DB967-69F9-6686-E579-A9176A7CAA5D}"
+EndProject
+
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C16A8634-36D6-4353-B246-D6F43E49D92A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C16A8634-36D6-4353-B246-D6F43E49D92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C16A8634-36D6-4353-B246-D6F43E49D92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C16A8634-36D6-4353-B246-D6F43E49D92A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D27B9745-47E7-4464-C357-E7A54F5AE83B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D27B9745-47E7-4464-C357-E7A54F5AE83B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D27B9745-47E7-4464-C357-E7A54F5AE83B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D27B9745-47E7-4464-C357-E7A54F5AE83B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E38CA856-58F8-5575-D468-F8A65A6BF94C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E38CA856-58F8-5575-D468-F8A65A6BF94C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E38CA856-58F8-5575-D468-F8A65A6BF94C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E38CA856-58F8-5575-D468-F8A65A6BF94C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F49DB967-69F9-6686-E579-A9176A7CAA5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F49DB967-69F9-6686-E579-A9176A7CAA5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F49DB967-69F9-6686-E579-A9176A7CAA5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F49DB967-69F9-6686-E579-A9176A7CAA5D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C16A8634-36D6-4353-B246-D6F43E49D92A} = {3E1E8F48-6D0E-4F3E-A1B9-8C2A5B4D7E9F}
+		{D27B9745-47E7-4464-C357-E7A54F5AE83B} = {3E1E8F48-6D0E-4F3E-A1B9-8C2A5B4D7E9F}
+		{E38CA856-58F8-5575-D468-F8A65A6BF94C} = {4F2F9A59-7E1F-42A4-B2C0-9D3B6C5E8FA0}
+		{F49DB967-69F9-6686-E579-A9176A7CAA5D} = {5A3B0A6A-8F2A-43A5-C3D1-AE4C7D6F9AB1}
+	EndGlobalSection
+EndGlobal

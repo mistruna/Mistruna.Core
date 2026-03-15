@@ -1,6 +1,6 @@
-# Contributing to snglrtycrvtureofspce.Core
+# Contributing to Mistruna.Core
 
-First off, thank you for considering contributing to snglrtycrvtureofspce.Core! It's people like you that make this SDK such a great tool.
+First off, thank you for considering contributing to Mistruna.Core! It's people like you that make this SDK such a great tool.
 
 ## Code of Conduct
 
@@ -85,12 +85,12 @@ dotnet format
 ## Project Structure
 
 ```
-snglrtycrvtureofspce.Core/
+Mistruna.Core/
 ├── src/
-│   ├── snglrtycrvtureofspce.Core/           # Main library
-│   └── snglrtycrvtureofspce.Core.Contracts/ # Contracts/interfaces only
+│   ├── Mistruna.Core/           # Main library
+│   └── Mistruna.Core.Contracts/ # Contracts/interfaces only
 ├── test/
-│   └── snglrtycrvtureofspce.Core.Tests/     # Unit tests
+│   └── Mistruna.Core.Tests/     # Unit tests
 ├── samples/                                  # Usage examples
 └── assets/                                   # Logo and assets
 ```

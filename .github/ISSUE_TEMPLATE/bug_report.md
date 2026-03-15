@@ -32,7 +32,7 @@ A clear and concise description of what you expected to happen.
 **Environment:**
 - OS: [e.g. Windows 11, Ubuntu 22.04]
 - .NET Version: [e.g. .NET 6.0, .NET 8.0]
-- snglrtycrvtureofspce.Core Version: [e.g. 1.0.44]
+- Mistruna.Core Version: [e.g. 1.0.44]
 
 **Additional context**
 Add any other context about the problem here.

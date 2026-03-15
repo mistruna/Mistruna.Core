@@ -1,6 +1,6 @@
 # Samples
 
-This directory contains sample projects demonstrating how to use snglrtycrvtureofspce.Core.
+This directory contains sample projects demonstrating how to use Mistruna.Core.
 
 ## Available Samples
 
@@ -14,7 +14,7 @@ A minimal API sample showing basic usage of:
 #### Running the Sample
 
 ```bash
-cd samples/snglrtycrvtureofspce.Core.Samples.BasicApi
+cd samples/Mistruna.Core.Samples.BasicApi
 dotnet run
 ```
 

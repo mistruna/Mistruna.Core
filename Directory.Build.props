@@ -13,16 +13,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Features>strict</Features>
-    
+
     <!-- Code analysis -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    
+
     <!-- Warnings configuration -->
     <NoWarn>$(NoWarn);CS1701;CS1702;NU1900</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    
+
     <!-- Build settings -->
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -30,27 +30,27 @@
 
   <!-- Package metadata (shared across all packable projects) -->
   <PropertyGroup>
-    <Authors>snglrtycrvtureofspce</Authors>
-    <Copyright>Copyright © snglrtycrvtureofspce $([System.DateTime]::Now.Year)</Copyright>
-    <PackageProjectUrl>https://github.com/snglrtycrvtureofspce/snglrtycrvtureofspce.Core</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/snglrtycrvtureofspce/snglrtycrvtureofspce.Core</RepositoryUrl>
+    <Authors>Mistruna</Authors>
+    <Copyright>Copyright © Mistruna $([System.DateTime]::Now.Year)</Copyright>
+    <PackageProjectUrl>https://github.com/mistruna/Mistruna.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mistruna/Mistruna.Core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>snglrtycrvtureofspce_128x128.png</PackageIcon>
+    <PackageIcon>mistruna_128x128.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>snglrtycrvtureofspce;asp.net;core;sdk;microservices</PackageTags>
-    
+    <PackageTags>mistruna;asp.net;core;sdk;microservices</PackageTags>
+
     <!-- Symbol package settings -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    
+
     <!-- Documentation -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    
+
     <!-- Versioning with MinVer -->
     <MinVerTagPrefix>v</MinVerTagPrefix>
-    
+
     <!-- CI/CD settings -->
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     <ContinuousIntegrationBuild Condition="'$(TF_BUILD)' == 'true'">true</ContinuousIntegrationBuild>
