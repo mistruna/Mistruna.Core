@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Mistruna.Core.Microservices.Core.Infrastructure.Authorization;
-using Mistruna.Core.Microservices.Core.JwtAuth.Entities;
+using Mistruna.Core.Microservices.Core.JwtAuth;
 using Mistruna.Core.Microservices.Core.JwtAuth.Policies;
 using Swashbuckle.AspNetCore.Filters;
 

@@ -1,6 +1,6 @@
-﻿using Mistruna.Core.Contracts.Base.Infrastructure;
+using Mistruna.Core.Contracts.Base.Infrastructure;
 
-namespace Mistruna.Core.Base.Responses;
+namespace Mistruna.Core.Contracts.Base.Responses;
 
 /// <summary>
 /// Standard paginated response including metadata and message.

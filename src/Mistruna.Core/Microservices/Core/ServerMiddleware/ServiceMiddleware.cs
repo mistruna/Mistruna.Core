@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Mistruna.Core.Microservices.Core.JwtAuth.Entities;
+using Mistruna.Core.Microservices.Core.JwtAuth;
 using Newtonsoft.Json;
 
 namespace Mistruna.Core.Microservices.Core.ServerMiddleware;

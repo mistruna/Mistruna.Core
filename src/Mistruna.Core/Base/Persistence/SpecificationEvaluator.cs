@@ -18,32 +18,46 @@ public static class SpecificationEvaluator
         var query = inputQuery;
 
         if (specification.Criteria is not null)
+        {
             query = query.Where(specification.Criteria);
+        }
 
         foreach (var include in specification.Includes)
+        {
             query = query.Include(include);
+        }
 
         foreach (var includeString in specification.IncludeStrings)
+        {
             query = query.Include(includeString);
+        }
 
         if (specification.OrderBy is not null)
+        {
             query = query.OrderBy(specification.OrderBy);
+        }
         else if (specification.OrderByDescending is not null)
+        {
             query = query.OrderByDescending(specification.OrderByDescending);
+        }
 
         if (specification.IsPagingEnabled)
         {
             if (specification.Skip.HasValue)
+            {
                 query = query.Skip(specification.Skip.Value);
+            }
+
             if (specification.Take.HasValue)
+            {
                 query = query.Take(specification.Take.Value);
+            }
         }
 
         if (specification.IsNoTracking)
+        {
             query = query.AsNoTracking();
-
-        if (specification.IsSplitQuery)
-            query = query.AsSplitQuery();
+        }
 
         return query;
     }

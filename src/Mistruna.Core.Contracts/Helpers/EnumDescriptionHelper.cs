@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
-namespace Mistruna.Core.Helpers;
+namespace Mistruna.Core.Contracts.Helpers;
 
 public static class EnumDescriptionHelper
 {

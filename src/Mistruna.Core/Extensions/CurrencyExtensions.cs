@@ -1,5 +1,5 @@
-﻿using Mistruna.Core.Enums;
-using Mistruna.Core.Models;
+﻿using Mistruna.Core.Contracts.Models;
+using Mistruna.Core.Enums;
 
 namespace Mistruna.Core.Extensions;
 

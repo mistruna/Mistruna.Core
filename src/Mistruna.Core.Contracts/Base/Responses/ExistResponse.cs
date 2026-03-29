@@ -1,13 +1,13 @@
-﻿using Mistruna.Core.Contracts.Base.Infrastructure;
+using Mistruna.Core.Contracts.Base.Infrastructure;
 
-namespace Mistruna.Core.Base.Responses;
+namespace Mistruna.Core.Contracts.Base.Responses;
 
 /// <summary>Standard response of exist operation</summary>
 public class ExistResponse : IResponse
 {
     /// <summary>Return Message</summary>
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
     /// <summary>Condition</summary>
-    public bool Exist { get; init; }
+    public bool Exist { get; set; }
 }

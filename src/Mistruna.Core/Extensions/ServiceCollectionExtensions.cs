@@ -151,11 +151,11 @@ public static class ServiceCollectionExtensions
 
         var objectFactory = ActivatorUtilities.CreateFactory(
             typeof(TDecorator),
-            new[] { typeof(TService) });
+            [typeof(TService)]);
 
         services.Add(ServiceDescriptor.Describe(
             typeof(TService),
-            sp => (TService)objectFactory(sp, new[] { sp.CreateInstance(wrappedDescriptor) }),
+            sp => (TService)objectFactory(sp, [sp.CreateInstance(wrappedDescriptor)]),
             wrappedDescriptor.Lifetime));
 
         services.Remove(wrappedDescriptor);
@@ -166,10 +166,14 @@ public static class ServiceCollectionExtensions
     private static object CreateInstance(this IServiceProvider services, ServiceDescriptor descriptor)
     {
         if (descriptor.ImplementationInstance != null)
+        {
             return descriptor.ImplementationInstance;
+        }
 
         if (descriptor.ImplementationFactory != null)
+        {
             return descriptor.ImplementationFactory(services);
+        }
 
         return ActivatorUtilities.GetServiceOrCreateInstance(
             services,

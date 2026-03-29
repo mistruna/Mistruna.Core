@@ -3,7 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Mistruna.Core.Base.Responses;
+using Mistruna.Core.Contracts.Base.Responses;
 using Mistruna.Core.Exceptions;
 
 namespace Mistruna.Core.Middlewares;

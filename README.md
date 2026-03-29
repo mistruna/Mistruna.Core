@@ -24,7 +24,6 @@
 - ⚠️ **Exception Handling** - Centralized exception middleware with consistent error responses
 - 🏗️ **Entity Framework Core** - Common patterns and helpers for EF Core
 - 🎲 **Result Pattern** - Functional error handling without exceptions
-- 🛡️ **Guard Clauses** - Defensive programming helpers
 - 📦 **Value Objects** - Email, Phone, Money, Address, DateRange
 - 🧩 **Domain Events** - Event-driven architecture support
 - 🔄 **Specification Pattern** - Encapsulated query logic
@@ -159,22 +158,6 @@ var result = GetUser(1)
     .Map(user => user.Email)
     .Bind(email => ValidateEmail(email))
     .Tap(email => _logger.Log($"Valid email: {email}"));
-```
-
-### Guard Clauses
-
-Defensive programming made easy:
-
-```csharp
-public void CreateUser(string name, string email, int age)
-{
-    Guard.AgainstNullOrEmpty(name, nameof(name));
-    Guard.AgainstInvalidEmail(email, nameof(email));
-    Guard.AgainstNegative(age, nameof(age));
-    Guard.AgainstOutOfRange(age, 0, 150, nameof(age));
-    
-    // Continue with valid data...
-}
 ```
 
 ### Value Objects

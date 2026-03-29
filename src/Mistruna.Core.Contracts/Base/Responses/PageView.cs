@@ -1,4 +1,4 @@
-﻿namespace Mistruna.Core.Base.Responses;
+namespace Mistruna.Core.Contracts.Base.Responses;
 
 /// <summary>
 /// Represents a paginated view of items with navigation metadata.
