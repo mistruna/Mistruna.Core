@@ -58,11 +58,10 @@ This package is useful when:
 
 ## Supported Frameworks
 
-| Framework | Version               |
-|-----------|-----------------------|
-| .NET | 10.0                  |
-| .NET Standard | 2.0 (Contracts only)  |
-| .NET Framework | 4.6.2+ (Windows only) |
+| Package | Target Framework |
+|---------|-----------------|
+| `Mistruna.Core` | .NET 10.0 |
+| `Mistruna.Core.Contracts` | .NET Standard 2.0 (.NET Framework 4.6.2+, .NET 5+) |
 
 ## Usage
 

@@ -30,9 +30,9 @@ A clear and concise description of what you expected to happen.
 ```
 
 **Environment:**
-- OS: [e.g. Windows 11, Ubuntu 22.04]
-- .NET Version: [e.g. .NET 6.0, .NET 8.0]
-- Mistruna.Core Version: [e.g. 1.0.44]
+- OS: [e.g. Windows 11, Ubuntu 24.04]
+- .NET Version: [e.g. .NET 10.0]
+- Mistruna.Core Version: [e.g. 2.0.0]
 
 **Additional context**
 Add any other context about the problem here.

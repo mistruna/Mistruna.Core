@@ -44,8 +44,7 @@ Please follow these steps to have your contribution considered:
 
 ### Prerequisites
 
-- [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) or later
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (recommended)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later
 - Your favorite IDE (Visual Studio, VS Code, Rider, etc.)
 
 ### Building
@@ -74,7 +73,7 @@ dotnet test --configuration Release --verbosity normal
 
 This project uses:
 - `.editorconfig` for code style settings
-- C# 12 language features
+- C# 14 language features
 - Nullable reference types enabled
 
 Before submitting a PR, please run:
@@ -91,8 +90,8 @@ Mistruna.Core/
 │   └── Mistruna.Core.Contracts/ # Contracts/interfaces only
 ├── test/
 │   └── Mistruna.Core.Tests/     # Unit tests
-├── samples/                                  # Usage examples
-└── assets/                                   # Logo and assets
+├── samples/                     # Usage examples
+└── assets/                      # Logo and assets
 ```
 
 ## Commit Messages
