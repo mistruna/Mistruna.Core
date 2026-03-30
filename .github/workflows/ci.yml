@@ -54,7 +54,7 @@ jobs:
         run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: ./coverage
           fail_ci_if_error: false
