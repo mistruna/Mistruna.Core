@@ -55,12 +55,23 @@ This package is useful when:
 - Building shared contract libraries
 - Reducing dependencies in client projects
 
+### Subpackages
+
+- **Mistruna.Core.Payments.Stripe** — Stripe webhook signature validation and typed event
+  records. Add only to services that process Stripe webhooks; other services continue to
+  depend on `Mistruna.Core` alone without pulling in `Stripe.net`.
+
+  ```bash
+  dotnet add package Mistruna.Core.Payments.Stripe
+  ```
+
 ## Supported Frameworks
 
 | Package | Target Framework |
 |---------|-----------------|
 | `Mistruna.Core` | .NET 10.0 |
 | `Mistruna.Core.Contracts` | .NET Standard 2.0 (.NET Framework 4.6.2+, .NET 5+) |
+| `Mistruna.Core.Payments.Stripe` | .NET 10.0 |
 
 ## Usage
 
