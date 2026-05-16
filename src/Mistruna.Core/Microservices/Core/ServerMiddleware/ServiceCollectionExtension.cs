@@ -1,6 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -15,6 +16,48 @@ public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddCustomAuthorization(this IServiceCollection services)
     {
+        return AddJwtAuthorizationCore(services, new JwtAuthorizationOptions
+        {
+            Issuer = AuthOptions.JwtIssuer,
+            Audience = AuthOptions.JwtIssuer,
+            Key = AuthOptions.JwtKey,
+            KeyId = AuthOptions.JwtKeyId
+        });
+    }
+
+    public static IServiceCollection AddJwtAuthorization(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Action<JwtAuthorizationOptions>? configure = null)
+    {
+        var options = new JwtAuthorizationOptions
+        {
+            Issuer = configuration["Jwt:Issuer"] ?? "Mistruna",
+            Audience = configuration["Jwt:Audience"] ?? configuration["Jwt:Issuer"] ?? "Mistruna",
+            Key = configuration["Jwt:Key"] ?? Environment.GetEnvironmentVariable("KEY"),
+            KeyId = configuration["Jwt:KeyId"] ?? "mistruna-signing-key"
+        };
+
+        configure?.Invoke(options);
+
+        if (string.IsNullOrWhiteSpace(options.Key) && options.AllowToolingFallbackKey)
+        {
+            options.Key = options.ToolingFallbackKey;
+        }
+
+        if (string.IsNullOrWhiteSpace(options.Key))
+        {
+            throw new InvalidOperationException(
+                "JWT signing key is not configured. Set 'Jwt:Key' in configuration or 'KEY' environment variable.");
+        }
+
+        return AddJwtAuthorizationCore(services, options);
+    }
+
+    private static IServiceCollection AddJwtAuthorizationCore(
+        IServiceCollection services,
+        JwtAuthorizationOptions options)
+    {
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
         services.AddAuthentication(options =>
@@ -27,18 +70,18 @@ public static class ServiceCollectionExtension
             {
                 cfg.RequireHttpsMetadata = false;
                 cfg.SaveToken = true;
-                var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AuthOptions.JwtKey))
+                var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Key!))
                 {
-                    KeyId = AuthOptions.JwtKeyId
+                    KeyId = options.KeyId
                 };
 
                 cfg.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = AuthOptions.JwtIssuer,
-                    ValidAudience = AuthOptions.JwtIssuer,
+                    ValidIssuer = options.Issuer,
+                    ValidAudience = options.Audience,
                     IssuerSigningKey = signingKey,
                     ClockSkew = TimeSpan.Zero,
-                    RoleClaimType = "role",
+                    RoleClaimType = options.RoleClaimType,
                     TryAllIssuerSigningKeys = true
                 };
             });

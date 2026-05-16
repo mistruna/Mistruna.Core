@@ -1,0 +1,100 @@
+using FluentAssertions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Mistruna.Core.Microservices.Core.JwtAuth;
+using Mistruna.Core.Microservices.Core.JwtAuth.Policies;
+using Mistruna.Core.Microservices.Core.ServerMiddleware;
+using Xunit;
+
+namespace Mistruna.Core.Tests.Authentication.Jwt;
+
+public sealed class JwtAuthorizationRegistrationTests
+{
+    [Fact]
+    public async Task AddJwtAuthorization_RegistersBearerSchemeFromConfiguration()
+    {
+        var services = new ServiceCollection();
+        var configuration = BuildConfiguration(new Dictionary<string, string?>
+        {
+            ["Jwt:Issuer"] = "ConfiguredIssuer",
+            ["Jwt:Audience"] = "ConfiguredAudience",
+            ["Jwt:Key"] = "12345678901234567890123456789012",
+            ["Jwt:KeyId"] = "configured-key-id"
+        });
+
+        services.AddLogging();
+        services.AddOptions();
+        services.AddJwtAuthorization(configuration);
+
+        await using var provider = services.BuildServiceProvider();
+        var schemeProvider = provider.GetRequiredService<IAuthenticationSchemeProvider>();
+        var bearerScheme = await schemeProvider.GetSchemeAsync(JwtBearerDefaults.AuthenticationScheme);
+        var options = provider.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+            .Get(JwtBearerDefaults.AuthenticationScheme);
+
+        bearerScheme.Should().NotBeNull();
+        options.TokenValidationParameters.ValidIssuer.Should().Be("ConfiguredIssuer");
+        options.TokenValidationParameters.ValidAudience.Should().Be("ConfiguredAudience");
+        options.TokenValidationParameters.RoleClaimType.Should().Be("role");
+        options.TokenValidationParameters.IssuerSigningKey.KeyId.Should().Be("configured-key-id");
+    }
+
+    [Fact]
+    public void AddJwtAuthorization_ThrowsWhenSigningKeyIsMissing()
+    {
+        var services = new ServiceCollection();
+        var configuration = BuildConfiguration(new Dictionary<string, string?>
+        {
+            ["Jwt:Issuer"] = "ConfiguredIssuer",
+            ["Jwt:Audience"] = "ConfiguredAudience"
+        });
+
+        var act = () => services.AddJwtAuthorization(configuration);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*JWT signing key is not configured*");
+    }
+
+    [Fact]
+    public void AddJwtAuthorization_CanUseToolingFallbackKey()
+    {
+        var services = new ServiceCollection();
+        var configuration = BuildConfiguration(new Dictionary<string, string?>
+        {
+            ["Jwt:Issuer"] = "ConfiguredIssuer"
+        });
+
+        services.AddJwtAuthorization(configuration, options =>
+        {
+            options.AllowToolingFallbackKey = true;
+            options.ToolingFallbackKey = "00000000-0000-0000-0000-000000000000";
+        });
+
+        using var provider = services.BuildServiceProvider();
+        var options = provider.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+            .Get(JwtBearerDefaults.AuthenticationScheme);
+
+        options.TokenValidationParameters.IssuerSigningKey.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddCustomAuthorization_RemainsAvailableForLegacyConsumers()
+    {
+        var services = new ServiceCollection();
+
+        services.AddCustomAuthorization();
+
+        using var provider = services.BuildServiceProvider();
+        var authorizationOptions = provider.GetRequiredService<IOptions<Microsoft.AspNetCore.Authorization.AuthorizationOptions>>().Value;
+
+        authorizationOptions.GetPolicy(Policies.AdminOnly).Should().NotBeNull();
+    }
+
+    private static IConfiguration BuildConfiguration(Dictionary<string, string?> values)
+        => new ConfigurationBuilder()
+            .AddInMemoryCollection(values)
+            .Build();
+}
