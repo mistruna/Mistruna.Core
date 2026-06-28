@@ -12,11 +12,15 @@ namespace Mistruna.Core.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds all Mistruna.Core services including MediatR, validation, and logging behaviors.
+    /// Adds all Mistruna.Core services including MediatR, FluentValidation, and logging behaviors.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="assemblies">Assemblies to scan for handlers and validators.</param>
     /// <returns>The service collection.</returns>
+    /// <remarks>
+    /// Mark write requests with <see cref="Abstractions.ICommand{TResponse}"/> and read requests with
+    /// <see cref="Abstractions.IQuery{TResponse}"/> so cross-cutting behaviors can target commands only.
+    /// </remarks>
     /// <example>
     /// <code>
     /// builder.Services.AddCore(typeof(Program).Assembly);

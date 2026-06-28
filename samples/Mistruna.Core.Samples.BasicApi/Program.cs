@@ -1,10 +1,12 @@
-using Mistruna.Core.Exceptions;
-using Mistruna.Core.Middlewares;
+using MediatR;
+using Mistruna.Core.Extensions;
+using Mistruna.Core.Samples.BasicApi.Features.Counter;
+using Mistruna.Core.Samples.BasicApi.Features.Ping;
 
 namespace Mistruna.Core.Samples.BasicApi;
 
 /// <summary>
-/// Sample minimal API demonstrating Mistruna.Core usage.
+/// Minimal API demonstrating Mistruna.Core registration, CQRS markers, and middleware.
 /// </summary>
 public static class Program
 {
@@ -12,16 +14,15 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services
+        builder.Services.AddCore(typeof(Program).Assembly);
+        builder.Services.AddCoreHealthChecks();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
         var app = builder.Build();
 
-        // Add exception handling middleware
-        app.UseMiddleware<ExceptionHandlingMiddleware>();
+        app.UseCoreMiddlewares();
 
-        // Configure Swagger
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -29,25 +30,24 @@ public static class Program
         }
 
         app.UseHttpsRedirection();
+        app.MapHealthChecks("/health");
 
-        // Sample endpoints
-        app.MapGet("/", () => "Hello from Mistruna.Core!")
-            .WithName("GetRoot");
-
-        app.MapGet("/error/notfound", () =>
+        app.MapGet("/", () => Results.Ok(new
         {
-            throw new NotFoundException("Sample resource not found");
-        }).WithName("ThrowNotFound");
+            message = "Mistruna.Core sample API",
+            endpoints = new[] { "/ping/{name}", "/counter/increment", "/errors/not-found" }
+        }));
 
-        app.MapGet("/error/conflict", () =>
-        {
-            throw new ConflictException("Sample conflict error");
-        }).WithName("ThrowConflict");
+        app.MapGet("/ping/{name}", async (string name, IMediator mediator) =>
+            Results.Ok(await mediator.Send(new PingQuery(name))));
 
-        app.MapGet("/error/forbidden", () =>
+        app.MapPost("/counter/increment", async (IMediator mediator, int step = 1) =>
+            Results.Ok(await mediator.Send(new IncrementCounterCommand { Step = step })));
+
+        app.MapGet("/errors/not-found", () =>
         {
-            throw new ForbiddenAccessException();
-        }).WithName("ThrowForbidden");
+            throw new Exceptions.NotFoundException("Sample resource not found");
+        });
 
         app.Run();
     }

@@ -1,29 +1,25 @@
 # Samples
 
-This directory contains sample projects demonstrating how to use Mistruna.Core.
+Sample projects demonstrating Mistruna.Core usage.
 
-## Available Samples
+## BasicApi
 
-### BasicApi
+Demonstrates:
 
-A minimal API sample showing basic usage of:
-- Exception handling middleware
-- Custom exceptions (`NotFoundException`, `ConflictException`, `ForbiddenAccessException`)
-- Swagger/OpenAPI integration
+- `AddCore()` — MediatR + FluentValidation + pipeline behaviors
+- CQRS markers — `IQuery<T>` and `ICommand<T>`
+- `UseCoreMiddlewares()` — centralized exception handling
+- `AddCoreHealthChecks()` — `/health` endpoint
+- Swagger in Development
 
-#### Running the Sample
+### Run
 
 ```bash
-cd samples/Mistruna.Core.Samples.BasicApi
-dotnet run
+dotnet run --project samples/Mistruna.Core.Samples.BasicApi
 ```
 
-Then navigate to `https://localhost:5001/swagger` to see the API documentation.
+Try:
 
-## Adding New Samples
-
-When adding new samples, please:
-1. Create a new folder under `samples/`
-2. Add a descriptive `README.md`
-3. Update this file with the new sample description
-4. Ensure the sample project references the main library via `ProjectReference`
+- `GET /ping/World`
+- `POST /counter/increment?step=2`
+- `GET /errors/not-found`
