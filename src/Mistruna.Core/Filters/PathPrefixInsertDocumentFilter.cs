@@ -3,6 +3,10 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Mistruna.Core.Filters;
 
+/// <summary>
+/// Swagger document filter that prepends a path prefix to all API routes.
+/// Useful when the API is hosted under a sub-path (e.g., "/api/v1").
+/// </summary>
 public class PathPrefixInsertDocumentFilter(string prefix) : IDocumentFilter
 {
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)

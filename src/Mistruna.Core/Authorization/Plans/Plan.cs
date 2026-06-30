@@ -2,8 +2,8 @@ namespace Mistruna.Core.Authorization.Plans;
 
 /// <summary>
 /// Subscription tiers in ascending order of capability.
-/// Ordering is load-bearing: <see cref="RequiresPlanAuthorizationHandler"/> compares
-/// the current user's tier against the required tier using the underlying integer value.
+/// The numeric ordering is load-bearing: <see cref="RequiresPlanAuthorizationHandler"/> compares
+/// tiers using the underlying integer values.
 /// </summary>
 public enum Plan
 {

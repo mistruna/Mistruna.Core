@@ -11,10 +11,17 @@ using RabbitMQ.Client.Events;
 
 namespace Mistruna.Core.Microservices.RabbitMq.Services.Implementations;
 
+/// <summary>
+/// Manages RabbitMQ operations: publishing, subscribing, and sending messages.
+/// Uses an object pool for <see cref="IModel"/> channels to reduce allocation overhead.
+/// </summary>
 public class RabbitManager(IPooledObjectPolicy<IModel> objectPolicy) : IRabbitManager
 {
     private readonly DefaultObjectPool<IModel> _objectPool = new(objectPolicy, Environment.ProcessorCount * 2);
 
+    /// <summary>
+    /// Publishes a message to a RabbitMQ exchange with the specified routing key.
+    /// </summary>
     public void Publish<T>(T message, string exchangeName, string exchangeType, string routeKey) where T : class
     {
         if (message == null)
@@ -34,7 +41,7 @@ public class RabbitManager(IPooledObjectPolicy<IModel> objectPolicy) : IRabbitMa
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new InvalidOperationException($"Failed to publish message to exchange '{exchangeName}'.", ex);
         }
         finally
         {
@@ -64,6 +71,10 @@ public class RabbitManager(IPooledObjectPolicy<IModel> objectPolicy) : IRabbitMa
         return respQueue.Take();
     }
 
+    /// <summary>
+    /// Sends a message to the exchange and routing key specified by the <see cref="RabbitQueryAttribute"/>
+    /// on the message type.
+    /// </summary>
     public void Send<T>(T message) where T : class
     {
         if (message == null)
@@ -75,7 +86,7 @@ public class RabbitManager(IPooledObjectPolicy<IModel> objectPolicy) : IRabbitMa
         if (typeof(T).GetCustomAttributes(typeof(RabbitQueryAttribute)).FirstOrDefault()
             is not RabbitQueryAttribute rabbitQueryAttribute)
         {
-            throw new Exception("The RabbitQueryAttribute attribute is not exist");
+            throw new InvalidOperationException($"The RabbitQueryAttribute does not exist on type {typeof(T).Name}.");
         }
 
         try
@@ -101,12 +112,16 @@ public class RabbitManager(IPooledObjectPolicy<IModel> objectPolicy) : IRabbitMa
         }
     }
 
+    /// <summary>
+    /// Registers a consumer that deserializes incoming messages and invokes a handler function.
+    /// The handler return value is discarded; this method is intended for fire-and-forget processing.
+    /// </summary>
     public void Consume<T, TE>(Func<T, TE> lambda)
     {
         if (typeof(T).GetCustomAttributes(typeof(RabbitQueryAttribute)).FirstOrDefault()
             is not RabbitQueryAttribute)
         {
-            throw new Exception("The RabbitQueryAttribute attribute is not exist");
+            throw new InvalidOperationException($"The RabbitQueryAttribute does not exist on type {typeof(T).Name}.");
         }
 
         var channel = _objectPool.Get();
@@ -122,16 +137,12 @@ public class RabbitManager(IPooledObjectPolicy<IModel> objectPolicy) : IRabbitMa
             try
             {
                 var message = JsonConvert.DeserializeObject<T>(content);
-                var res = lambda(message);
-                message = default(T);
-                res = default(TE);
+                _ = lambda(message);
             }
             finally
             {
                 channel.BasicAck(ea.DeliveryTag, false);
             }
-
-            content = null;
         });
     }
 }

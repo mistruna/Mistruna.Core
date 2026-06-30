@@ -8,6 +8,10 @@ using Mistruna.Core.RateLimiting.Tiered;
 
 namespace Mistruna.Core.Extensions;
 
+/// <summary>
+/// Application builder extensions for registering monetization middlewares
+/// (tiered rate limiting, idempotency, and usage metering).
+/// </summary>
 public static class MonetizationApplicationBuilderExtensions
 {
     /// <summary>
@@ -23,6 +27,10 @@ public static class MonetizationApplicationBuilderExtensions
             return new TieredRateLimitMiddleware(_ => next(context), options, store, logger).InvokeAsync(context);
         });
 
+    /// <summary>
+    /// Adds <see cref="IdempotencyMiddleware"/> to the pipeline. Intercepts mutating requests
+    /// carrying an <c>Idempotency-Key</c> header and caches responses for replay.
+    /// </summary>
     public static IApplicationBuilder UseIdempotency(this IApplicationBuilder app) =>
         app.Use((context, next) =>
         {
@@ -32,6 +40,10 @@ public static class MonetizationApplicationBuilderExtensions
             return new IdempotencyMiddleware(_ => next(context), options, store, logger).InvokeAsync(context);
         });
 
+    /// <summary>
+    /// Adds <see cref="UsageMeteringMiddleware"/> to the pipeline. Records successful API key usage
+    /// for billing and quota tracking.
+    /// </summary>
     public static IApplicationBuilder UseUsageMetering(this IApplicationBuilder app) =>
         app.Use((context, next) =>
         {

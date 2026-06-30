@@ -3,13 +3,30 @@ using Mistruna.Core.Enums;
 
 namespace Mistruna.Core.Extensions;
 
+/// <summary>
+/// Provides extension methods for working with <see cref="Currency"/> values.
+/// </summary>
 public static class CurrencyExtensions
 {
+    /// <inheritdoc />
     extension(Currency currency)
     {
+        /// <summary>
+        /// Gets the ISO 4217 alphabetic currency code (e.g., "USD").
+        /// </summary>
         public string GetCode() => currency.ToString().ToUpperInvariant();
+
+        /// <summary>
+        /// Gets the ISO 4217 numeric currency code as a <see cref="short"/>.
+        /// </summary>
         public short GetNumeric() => (short)currency;
 
+        /// <summary>
+        /// Gets the full descriptive name of the currency (e.g., "US Dollar").
+        /// </summary>
+        /// <summary>
+        /// Gets the full descriptive name of the currency (e.g., "US Dollar").
+        /// </summary>
         public string GetFullName()
             => currency switch
             {
@@ -221,6 +238,13 @@ public static class CurrencyExtensions
                 _ => throw new ArgumentOutOfRangeException(nameof(currency), currency, "Unsupported currency.")
             };
 
+        /// <summary>
+        /// Gets the currency symbol used in display (e.g., "$", "€", "¥").
+        /// </summary>
+        /// <summary>
+        /// Gets the currency symbol used in display (e.g., "$", "€", "¥").
+        /// Returns the alphabetic code as a fallback for currencies without a dedicated symbol.
+        /// </summary>
         public string GetSymbol()
             => currency switch
             {
@@ -357,6 +381,12 @@ public static class CurrencyExtensions
                 _ => currency.GetCode()
             };
 
+        /// <summary>
+        /// Gets a structured <see cref="CurrencyInfo"/> record containing all currency metadata.
+        /// </summary>
+        /// <summary>
+        /// Gets a structured <see cref="CurrencyInfo"/> record containing all currency metadata.
+        /// </summary>
         public CurrencyInfo GetInfo()
             => new(
                 Code: currency.GetCode(),
@@ -365,6 +395,12 @@ public static class CurrencyExtensions
                 Symbol: currency.GetSymbol());
     }
 
+    /// <summary>
+    /// Attempts to parse a currency code string into a <see cref="Currency"/> value.
+    /// </summary>
+    /// <param name="code">The currency code to parse (e.g., "USD").</param>
+    /// <param name="currency">The parsed currency value.</param>
+    /// <returns>True if parsing succeeded, otherwise false.</returns>
     public static bool TryParse(string code, out Currency currency)
     {
         if (!string.IsNullOrWhiteSpace(code))
@@ -376,6 +412,12 @@ public static class CurrencyExtensions
         return false;
     }
 
+    /// <summary>
+    /// Parses a currency code string into a <see cref="Currency"/> value.
+    /// </summary>
+    /// <param name="code">The currency code to parse (e.g., "USD").</param>
+    /// <returns>The parsed currency value.</returns>
+    /// <exception cref="ArgumentException">Thrown when the code is not a valid currency.</exception>
     public static Currency Parse(string code)
         => TryParse(code, out var currency)
             ? currency

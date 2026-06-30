@@ -1,5 +1,8 @@
 namespace Mistruna.Core.RateLimiting.Tiered;
 
+/// <summary>
+/// Configuration options for tiered rate limiting middleware.
+/// </summary>
 public sealed class TieredRateLimitOptions
 {
     /// <summary>Rolling window size, in seconds. Defaults to 86,400 (daily quota).</summary>

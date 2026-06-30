@@ -1,5 +1,8 @@
 namespace Mistruna.Core.Idempotency;
 
+/// <summary>
+/// Configuration options for the idempotency middleware.
+/// </summary>
 public sealed class IdempotencyOptions
 {
     /// <summary>Header name carrying the client-supplied key. Defaults to <c>Idempotency-Key</c>.</summary>

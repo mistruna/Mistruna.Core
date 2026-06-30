@@ -11,6 +11,10 @@ using RabbitMQ.Client.Events;
 
 namespace Mistruna.Core.Microservices.RabbitMq.RabbitMqEndpointBinder;
 
+/// <summary>
+/// Wraps a RabbitMQ queue consumer that dispatches incoming messages through MediatR.
+/// Each message is handled within a scoped service provider to support DI in handlers.
+/// </summary>
 public class RabbitMqWrapper<T> : IBus
 {
     private readonly IModel _channel;
@@ -47,24 +51,15 @@ public class RabbitMqWrapper<T> : IBus
             var content = Encoding.UTF8.GetString(ea.Body.ToArray());
             try
             {
-                IMediator mediator;
-                T message;
-                using (IServiceScope scope = _serviceProvider.CreateScope())
-                {
-                    mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                    message = JsonConvert.DeserializeObject<T>(content);
-                    object obj = await mediator.Send((object)message, stoppingToken);
-                }
-
-                mediator = (IMediator)null;
-                message = default(T);
+                using var scope = _serviceProvider.CreateScope();
+                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                var message = JsonConvert.DeserializeObject<T>(content);
+                _ = await mediator.Send((object)message, stoppingToken);
             }
             finally
             {
                 _channel.BasicAck(ea.DeliveryTag, false);
             }
-
-            content = (string)null;
         });
         _channel.BasicConsume(_queue, false, (IBasicConsumer)consumer);
 

@@ -6,6 +6,9 @@ using Mistruna.Core.Microservices.RabbitMq.Services.Interfaces;
 
 namespace Mistruna.Core.Microservices.RabbitMq.Services.Implementations;
 
+/// <summary>
+/// Background service that starts all configured RabbitMQ message bus consumers on application startup.
+/// </summary>
 public class RabbitMqHostedService : BackgroundService
 {
     private readonly IList<IBus> _wrappers;

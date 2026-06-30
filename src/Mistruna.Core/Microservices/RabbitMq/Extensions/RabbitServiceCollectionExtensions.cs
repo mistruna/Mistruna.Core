@@ -9,8 +9,17 @@ using RabbitMQ.Client;
 
 namespace Mistruna.Core.Microservices.RabbitMq.Extensions;
 
+/// <summary>
+/// DI registration helpers for RabbitMQ messaging infrastructure.
+/// </summary>
 public static class RabbitServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registers the RabbitMQ connection, channel pool, and <see cref="IRabbitManager"/> implementation.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configuration">The application configuration (expects a "RabbitMq" section).</param>
+    /// <returns>The service collection.</returns>
     public static IServiceCollection AddRabbit(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<RabbitMqConfiguration>(configuration.GetSection("RabbitMq"));
@@ -21,6 +30,11 @@ public static class RabbitServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Registers message bus endpoints and the hosted service that starts consuming messages.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configuration">Action to configure the endpoints collection.</param>
     public static void AddRabbitMqEndpoints(
         this IServiceCollection services,
         Action<EndpointsConfiguration> configuration)

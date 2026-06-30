@@ -5,6 +5,10 @@ using RabbitMQ.Client;
 
 namespace Mistruna.Core.Microservices.RabbitMq.Services.Implementations;
 
+/// <summary>
+/// Object pool policy that creates and manages <see cref="IModel"/> (RabbitMQ channel) instances.
+/// Reuses connections to avoid the overhead of establishing a new TCP connection per operation.
+/// </summary>
 public class RabbitModelPooledObjectPolicy : IPooledObjectPolicy<IModel>
 {
     private readonly RabbitMqConfiguration _options;

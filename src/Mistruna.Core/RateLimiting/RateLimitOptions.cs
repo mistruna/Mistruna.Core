@@ -1,7 +1,7 @@
 namespace Mistruna.Core.RateLimiting;
 
 /// <summary>
-/// Configuration options for the rate limiting middleware.
+/// Configuration options for IP-based rate limiting middleware.
 /// </summary>
 public class RateLimitOptions
 {

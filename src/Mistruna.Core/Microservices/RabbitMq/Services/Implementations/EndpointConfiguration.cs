@@ -6,6 +6,10 @@ using Mistruna.Core.Microservices.RabbitMq.Services.Interfaces;
 
 namespace Mistruna.Core.Microservices.RabbitMq.Services.Implementations;
 
+/// <summary>
+/// Generic endpoint configuration that binds a message type <typeparamref name="T"/> to a RabbitMQ queue.
+/// </summary>
+/// <typeparam name="T">The message type handled by this endpoint.</typeparam>
 public class EndpointConfiguration<T> : IEndpointConfiguration
 {
     public string Queue { get; init; }

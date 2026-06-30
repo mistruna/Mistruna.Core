@@ -5,7 +5,7 @@ using Mistruna.Core.Microservices.Core.Configurations;
 namespace Mistruna.Core.Extensions;
 
 /// <summary>
-/// Extension methods for configuring CORS in the DI container.
+/// Provides extension methods for configuring CORS policies in the DI container.
 /// </summary>
 public static class CorsExtensions
 {

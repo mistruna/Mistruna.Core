@@ -1,7 +1,7 @@
 namespace Mistruna.Core.Extensions;
 
 /// <summary>
-/// Provides extension methods for working with DateTime.
+/// Provides extension methods for working with <see cref="DateTime"/> values.
 /// </summary>
 public static class DateTimeExtensions
 {
