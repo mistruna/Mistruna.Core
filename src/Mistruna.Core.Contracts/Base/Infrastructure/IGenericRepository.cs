@@ -1,23 +1,13 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace Mistruna.Core.Contracts.Base.Infrastructure;
 
 /// <summary>
-/// Universal repository for entities.
-/// Provides basic CRUD operations and advanced query capabilities.
+/// Read-only repository contract for entities.
 /// </summary>
-public interface IGenericRepository<T> where T : class, IEntity
+/// <typeparam name="T">The entity type.</typeparam>
+public interface IReadRepository<T> where T : class, IEntity
 {
-    /// <summary>
-    /// Asynchronously adds an entity to the repository.
-    /// </summary>
-    ValueTask AddAsync(T entity, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Asynchronously adds multiple entities to the repository.
-    /// </summary>
-    Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
-
     /// <summary>
     /// Returns the entity by identifier.
     /// </summary>
@@ -71,6 +61,31 @@ public interface IGenericRepository<T> where T : class, IEntity
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Returns a queryable for advanced queries.
+    /// </summary>
+    IQueryable<T> AsQueryable();
+}
+
+/// <summary>
+/// Write-only repository contract for entities.
+/// </summary>
+/// <typeparam name="T">The entity type.</typeparam>
+/// <remarks>
+/// Write operations only update the current persistence context. Persist changes through <see cref="IUnitOfWork.SaveChangesAsync"/>.
+/// </remarks>
+public interface IWriteRepository<T> where T : class, IEntity
+{
+    /// <summary>
+    /// Asynchronously adds an entity to the repository.
+    /// </summary>
+    ValueTask AddAsync(T entity, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Asynchronously adds multiple entities to the repository.
+    /// </summary>
+    Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Updates the entity.
     /// </summary>
     Task UpdateAsync(T entity, CancellationToken cancellationToken = default);
@@ -89,14 +104,15 @@ public interface IGenericRepository<T> where T : class, IEntity
     /// Deletes multiple entities.
     /// </summary>
     Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Saves the changes to the context.
-    /// </summary>
-    Task SaveChangesAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Returns a queryable for advanced queries.
-    /// </summary>
-    IQueryable<T> AsQueryable();
 }
+
+/// <summary>
+/// Universal repository contract for entities.
+/// </summary>
+/// <typeparam name="T">The entity type.</typeparam>
+/// <remarks>
+/// Combines read and write operations. Prefer <see cref="IReadRepository{T}"/> or <see cref="IWriteRepository{T}"/>
+/// in consumers that only need one side of the contract.
+/// </remarks>
+public interface IGenericRepository<T> : IReadRepository<T>, IWriteRepository<T>
+    where T : class, IEntity;

@@ -24,7 +24,7 @@ namespace Mistruna.Core.Contracts.Base.Infrastructure;
 /// }
 /// </code>
 /// </example>
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork : IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Saves all changes made in this unit of work to the database.
@@ -38,7 +38,7 @@ public interface IUnitOfWork : IDisposable
     /// </summary>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A transaction object that must be committed or rolled back.</returns>
-    Task<IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+    Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Executes a block of code within a transaction.
@@ -62,9 +62,9 @@ public interface IUnitOfWork : IDisposable
 }
 
 /// <summary>
-/// Represents a database transaction.
+/// Represents a transaction owned by a unit of work.
 /// </summary>
-public interface IDbTransaction : IDisposable
+public interface IUnitOfWorkTransaction : IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Gets the transaction identifier.
@@ -83,3 +83,8 @@ public interface IDbTransaction : IDisposable
     /// <param name="cancellationToken">A cancellation token.</param>
     Task RollbackAsync(CancellationToken cancellationToken = default);
 }
+
+/// <summary>
+/// Compatibility alias for <see cref="IUnitOfWorkTransaction"/>.
+/// </summary>
+public interface IDbTransaction : IUnitOfWorkTransaction;

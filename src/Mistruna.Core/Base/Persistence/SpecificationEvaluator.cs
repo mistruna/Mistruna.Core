@@ -54,6 +54,11 @@ public static class SpecificationEvaluator
             }
         }
 
+        if (specification.IsSplitQuery)
+        {
+            query = query.AsSplitQuery();
+        }
+
         if (specification.IsNoTracking)
         {
             query = query.AsNoTracking();

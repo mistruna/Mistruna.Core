@@ -22,14 +22,12 @@ public abstract class EfGenericRepository<T, TContext>(TContext context, DbSet<T
     public async ValueTask AddAsync(T entity, CancellationToken cancellationToken = default)
     {
         await DbSet.AddAsync(entity, cancellationToken);
-        await SaveChangesAsync(cancellationToken);
     }
 
     /// <inheritdoc />
     public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
     {
         await DbSet.AddRangeAsync(entities, cancellationToken);
-        await SaveChangesAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -44,7 +42,7 @@ public abstract class EfGenericRepository<T, TContext>(TContext context, DbSet<T
     public async Task<IReadOnlyList<T>> FindAsync(
         Expression<Func<T, bool>> predicate,
         CancellationToken cancellationToken = default)
-        => await DbSet.Where(predicate).ToListAsync(cancellationToken);
+        => await DbSet.AsNoTracking().Where(predicate).ToListAsync(cancellationToken);
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<T>> FindAsync(
@@ -88,37 +86,31 @@ public abstract class EfGenericRepository<T, TContext>(TContext context, DbSet<T
         => await DbSet.AnyAsync(predicate, cancellationToken);
 
     /// <inheritdoc />
-    public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
         DbSet.Update(entity);
-        await SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public async Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+    public Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
     {
         DbSet.UpdateRange(entities);
-        await SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
     {
         DbSet.Remove(entity);
-        await SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public async Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+    public Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
     {
         DbSet.RemoveRange(entities);
-        await SaveChangesAsync(cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        await Context.SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />

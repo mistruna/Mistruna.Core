@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mistruna.Core.Contracts.Base.Infrastructure;
-using IDbTransaction = Mistruna.Core.Contracts.Base.Infrastructure.IDbTransaction;
 
 namespace Mistruna.Core.Base.Persistence;
 
@@ -10,18 +9,31 @@ namespace Mistruna.Core.Base.Persistence;
 /// Wraps <see cref="DbContext"/> to provide transactional boundaries.
 /// </summary>
 /// <typeparam name="TContext">The DbContext type.</typeparam>
-public class EfUnitOfWork<TContext>(TContext context) : IUnitOfWork
+public sealed class EfUnitOfWork<TContext>(TContext context) : IUnitOfWork
     where TContext : DbContext
 {
-    /// <inheritdoc />
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        => await context.SaveChangesAsync(cancellationToken);
+    private IDbContextTransaction? _currentTransaction;
+    private bool _disposed;
 
     /// <inheritdoc />
-    public async Task<IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
-        return new EfDbTransaction(transaction);
+        ThrowIfDisposed();
+        return await context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        ThrowIfDisposed();
+
+        if (_currentTransaction is not null)
+        {
+            throw new InvalidOperationException("A database transaction is already active for this unit of work.");
+        }
+
+        _currentTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        return new EfDbTransaction(_currentTransaction, ClearTransaction);
     }
 
     /// <inheritdoc />
@@ -29,18 +41,24 @@ public class EfUnitOfWork<TContext>(TContext context) : IUnitOfWork
         Func<CancellationToken, Task> action,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
-        try
+        ArgumentNullException.ThrowIfNull(action);
+
+        var strategy = context.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async operationCancellationToken =>
         {
-            await action(cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+            await using var transaction = await BeginTransactionAsync(operationCancellationToken);
+            try
+            {
+                await action(operationCancellationToken);
+                await SaveChangesAsync(operationCancellationToken);
+                await transaction.CommitAsync(operationCancellationToken);
+            }
+            catch
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
+                throw;
+            }
+        }, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -48,48 +66,179 @@ public class EfUnitOfWork<TContext>(TContext context) : IUnitOfWork
         Func<CancellationToken, Task<TResult>> action,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
-        try
+        ArgumentNullException.ThrowIfNull(action);
+
+        var strategy = context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async operationCancellationToken =>
         {
-            var result = await action(cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-            return result;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+            await using var transaction = await BeginTransactionAsync(operationCancellationToken);
+            try
+            {
+                var result = await action(operationCancellationToken);
+                await SaveChangesAsync(operationCancellationToken);
+                await transaction.CommitAsync(operationCancellationToken);
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
+                throw;
+            }
+        }, cancellationToken);
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _currentTransaction?.Dispose();
         context.Dispose();
+        _disposed = true;
         GC.SuppressFinalize(this);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (_currentTransaction is not null)
+        {
+            await _currentTransaction.DisposeAsync();
+        }
+
+        await context.DisposeAsync();
+        _disposed = true;
+        GC.SuppressFinalize(this);
+    }
+
+    private void ClearTransaction(IDbContextTransaction transaction)
+    {
+        if (ReferenceEquals(_currentTransaction, transaction))
+        {
+            _currentTransaction = null;
+        }
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(EfUnitOfWork<TContext>));
+        }
     }
 }
 
 /// <summary>
-/// Wraps EF Core's <see cref="IDbContextTransaction"/> to implement <see cref="IDbTransaction"/>.
+/// Wraps EF Core's <see cref="IDbContextTransaction"/> to implement <see cref="IUnitOfWorkTransaction"/>.
 /// </summary>
-internal sealed class EfDbTransaction(IDbContextTransaction transaction) : IDbTransaction
+internal sealed class EfDbTransaction(
+    IDbContextTransaction transaction,
+    Action<IDbContextTransaction> onCompleted) : IUnitOfWorkTransaction, IDbTransaction
 {
+    private bool _completed;
+    private bool _disposed;
+
     /// <inheritdoc />
-    public Guid TransactionId { get; } = Guid.NewGuid();
+    public Guid TransactionId { get; } = transaction.TransactionId;
 
     /// <inheritdoc />
     public async Task CommitAsync(CancellationToken cancellationToken = default)
-        => await transaction.CommitAsync(cancellationToken);
+    {
+        ThrowIfDisposed();
+        if (_completed)
+        {
+            return;
+        }
+
+        await transaction.CommitAsync(cancellationToken);
+        Complete();
+    }
 
     /// <inheritdoc />
     public async Task RollbackAsync(CancellationToken cancellationToken = default)
-        => await transaction.RollbackAsync(cancellationToken);
+    {
+        ThrowIfDisposed();
+        if (_completed)
+        {
+            return;
+        }
+
+        await transaction.RollbackAsync(cancellationToken);
+        Complete();
+    }
 
     /// <inheritdoc />
     public void Dispose()
     {
-        transaction.Dispose();
+        if (_disposed)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!_completed)
+            {
+                transaction.Rollback();
+            }
+        }
+        finally
+        {
+            transaction.Dispose();
+            _disposed = true;
+            Complete();
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!_completed)
+            {
+                await transaction.RollbackAsync();
+            }
+        }
+        finally
+        {
+            await transaction.DisposeAsync();
+            _disposed = true;
+            Complete();
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    private void Complete()
+    {
+        if (_completed)
+        {
+            return;
+        }
+
+        _completed = true;
+        onCompleted(transaction);
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(EfDbTransaction));
+        }
     }
 }
