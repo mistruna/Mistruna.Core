@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Mistruna.Core.Microservices.Core.Infrastructure.Authorization;
 using Mistruna.Core.Microservices.Core.JwtAuth;
 using Mistruna.Core.Microservices.Core.JwtAuth.Policies;
@@ -109,8 +109,9 @@ public static class ServiceCollectionExtension
             {
                 Description = "JWT Authorization header using the Bearer scheme. " +
                               "Example: \"Authorization: Bearer {token}\"",
-                Name = "Authorization",
-                In = ParameterLocation.Header
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT"
             });
             c.OperationFilter<SecurityRequirementsOperationFilter>();
         });
