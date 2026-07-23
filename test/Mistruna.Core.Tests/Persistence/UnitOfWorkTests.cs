@@ -3,9 +3,8 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using Mistruna.Core.Base.Persistence;
-using Mistruna.Core.Contracts.Base.Infrastructure;
-using Mistruna.Core.Extensions;
+using Mistruna.Core.Abstractions.Persistence;
+using Mistruna.Core.EfCore;
 using Xunit;
 
 namespace Mistruna.Core.Tests.Persistence;
@@ -241,19 +240,67 @@ public sealed class UnitOfWorkTests
     }
 
     [Fact]
-    public async Task AddEfUnitOfWork_ShouldRegisterScopedUnitOfWork()
+    public async Task Dispose_ShouldNotDisposeInjectedDbContext()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        await using var context = database.CreateContext();
+        var unitOfWork = new EfUnitOfWork<TestDbContext>(context);
+
+        unitOfWork.Dispose();
+
+        var action = () => context.Entities.Any();
+        action.Should().NotThrow();
+    }
+
+    [Fact]
+    public async Task DisposeAsync_ShouldNotDisposeInjectedDbContext()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        await using var context = database.CreateContext();
+        var unitOfWork = new EfUnitOfWork<TestDbContext>(context);
+
+        await unitOfWork.DisposeAsync();
+
+        var action = () => context.Entities.AnyAsync();
+        await action.Should().NotThrowAsync();
+    }
+
+    [Fact]
+    public async Task AddMistrunaEfCore_ShouldRegisterScopedPersistenceServices()
     {
         await using var database = await TestDatabase.CreateAsync();
         var services = new ServiceCollection();
         services.AddDbContext<TestDbContext>(options => options.UseSqlite(database.Connection));
 
-        services.AddEfUnitOfWork<TestDbContext>();
+        services.AddMistrunaEfCore<TestDbContext>();
 
         await using var provider = services.BuildServiceProvider();
         using var scope = provider.CreateScope();
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var repository = scope.ServiceProvider.GetRequiredService<IGenericRepository<TestEntity>>();
 
         unitOfWork.Should().BeOfType<EfUnitOfWork<TestDbContext>>();
+        repository.Should().BeOfType<EfGenericRepository<TestEntity>>();
+    }
+
+    [Fact]
+    public async Task RegisteredServices_ShouldPersistChangesWithEfInMemory()
+    {
+        var services = new ServiceCollection();
+        services.AddDbContext<TestDbContext>(
+            options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+        services.AddMistrunaEfCore<TestDbContext>();
+
+        await using var provider = services.BuildServiceProvider();
+        await using var scope = provider.CreateAsyncScope();
+        var repository = scope.ServiceProvider.GetRequiredService<IGenericRepository<TestEntity>>();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        await repository.AddAsync(new TestEntity { Id = Guid.NewGuid(), Name = "in-memory" });
+        await unitOfWork.SaveChangesAsync();
+
+        var context = scope.ServiceProvider.GetRequiredService<TestDbContext>();
+        (await context.Entities.SingleAsync()).Name.Should().Be("in-memory");
     }
 
     private sealed class TestDatabase : IAsyncDisposable
@@ -355,5 +402,5 @@ public sealed class UnitOfWorkTests
     }
 
     private sealed class TestEntityRepository(TestDbContext context)
-        : EfGenericRepository<TestEntity, TestDbContext>(context, context.Entities);
+        : EfGenericRepository<TestEntity>(context);
 }

@@ -2,180 +2,109 @@
 
 [![CI](https://github.com/mistruna/Mistruna.Core/workflows/CI/badge.svg)](https://github.com/mistruna/Mistruna.Core/actions?query=workflow%3ACI)
 [![NuGet](https://img.shields.io/nuget/v/Mistruna.Core.svg)](https://www.nuget.org/packages/Mistruna.Core)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Mistruna.Core.svg)](https://www.nuget.org/packages/Mistruna.Core)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Production-oriented SDK for ASP.NET Core microservices** — MediatR CQRS, validation, JWT, RabbitMQ, Redis, health checks, rate limiting, idempotency, usage metering, and consistent API primitives.
+Production-oriented .NET building blocks for ASP.NET Core microservices: CQRS, validation, ProblemDetails, persistence, Redis, RabbitMQ, observability, resilience, and optional monetization primitives.
 
-[Quick start](#quick-start) • [Packages](#packages) • [CQRS](#cqrs-icommand--iquery) • [Features](#features) • [Samples](samples/)
-
----
+Mistruna.Core v5 is a package-based redesign. Version 4 is frozen and receives no new features; see the [v5 migration guide](docs/migration-v5.md).
 
 ## Packages
 
-| Package | Target | Purpose |
-|---------|--------|---------|
-| `Mistruna.Core` | .NET 10 | Full SDK implementation |
-| `Mistruna.Core.Contracts` | .NET Standard 2.0 | Interfaces, entities, `Result<T>`, specifications |
+| Package | TFM | Responsibility |
+|---------|-----|----------------|
+| `Mistruna.Core.Abstractions` | `net8.0;net10.0` | Results, CQRS markers, entity/value-object bases, persistence contracts, domain events, and pagination DTOs |
+| `Mistruna.Core` | `net10.0` | MediatR registration, validation and logging behaviors, exceptions, and core DI |
+| `Mistruna.Core.AspNetCore` | `net10.0` | ProblemDetails, health, versioning, CORS, JWT, and IP rate limiting |
+| `Mistruna.Core.EfCore` | `net10.0` | EF repositories, unit of work, and conventions |
+| `Mistruna.Core.Caching.Redis` | `net10.0` | Redis caching and health check |
+| `Mistruna.Core.Messaging.RabbitMq` | `net10.0` | RabbitMQ.Client 7 asynchronous bus |
+| `Mistruna.Core.Monetization` | `net10.0` | API keys, plan authorization, tiered rate limits, idempotency, and metering |
+| `Mistruna.Core.Observability` | `net10.0` | OpenTelemetry registration and MediatR activity enrichment |
+| `Mistruna.Core.Resilience` | `net10.0` | HttpClient resilience presets and marked-command retry behavior |
+| `Mistruna.Core.Testing` | `net10.0` | EF async providers and consumer test helpers |
+
+There is no umbrella meta-package. Add only the packages your service uses:
 
 ```bash
 dotnet add package Mistruna.Core
-# optional contracts-only package for shared libraries:
-dotnet add package Mistruna.Core.Contracts
+dotnet add package Mistruna.Core.AspNetCore
+dotnet add package Mistruna.Core.EfCore
 ```
-
----
 
 ## Quick start
 
 ```csharp
-// Program.cs
-builder.Services.AddCore(typeof(Program).Assembly);
-builder.Services.AddCoreHealthChecks();
+using Mistruna.Core.DependencyInjection;
+using Mistruna.Core.AspNetCore.DependencyInjection;
+using Mistruna.Core.EfCore;
+
+builder.Services.AddMistrunaCore(options =>
+{
+    options.RegisterAssemblies(typeof(Program).Assembly);
+    options.AddValidation();
+    options.AddLoggingBehavior();
+});
+builder.Services.AddMistrunaAspNetCore();
+builder.Services.AddMistrunaEfCore<AppDbContext>();
 
 var app = builder.Build();
-app.UseCoreMiddlewares();
-app.MapHealthChecks("/health");
+app.UseMistrunaExceptionHandler();
 ```
 
-Define handlers with CQRS markers:
+Optional integrations compose independently:
+
+```csharp
+builder.Services.AddMistrunaRedis(builder.Configuration);
+builder.Services.AddMistrunaRabbitMq(builder.Configuration);
+builder.Services.AddMistrunaObservability(builder.Configuration);
+builder.Services.AddMistrunaResilience();
+builder.Services.AddMistrunaMonetization();
+
+app.UseMistrunaTieredRateLimiting();
+app.UseMistrunaIdempotency();
+app.UseMistrunaUsageMetering();
+```
+
+Define requests with the markers from `Mistruna.Core.Abstractions`:
 
 ```csharp
 public sealed record GetUserQuery(Guid Id) : IQuery<UserDto>;
-
-public sealed class CreateUserCommand : ICommand<Guid>
-{
-    public string Email { get; init; } = string.Empty;
-}
+public sealed record CreateUserCommand(string Email) : ICommand<Guid>;
 ```
 
-Run the sample API:
+## Foundation features
 
-```bash
-dotnet run --project samples/Mistruna.Core.Samples.BasicApi
-```
+- System.Text.Json-only serialization and RFC 7807 ProblemDetails
+- MediatR command/query markers with opt-in validation and logging behaviors
+- EF Core repository, specification, and unit-of-work implementations
+- Redis caching and health checks
+- RabbitMQ.Client 7 async publishing via `IMistrunaRabbitBus.PublishAsync`
+- OpenTelemetry tracing, metrics, and MediatR activity enrichment
+- HttpClient resilience presets and optional marked-command retries
+- API key authentication, plan authorization, rate limits, idempotency, and metering
+- EF async query providers and result assertions for consumer tests
 
----
-
-## CQRS (`ICommand` / `IQuery`)
-
-Mistruna.Core ships MediatR marker interfaces in `Mistruna.Core.Abstractions`:
-
-- **`ICommand` / `ICommand<TResponse>`** — write operations (create, update, delete, auth flows)
-- **`IQuery<TResponse>`** — read-only operations
-
-Use `RequestKind` in custom pipeline behaviors:
-
-```csharp
-if (!RequestKind.IsCommand(typeof(TRequest)))
-    return await next();
-```
-
-This keeps audit logging, metering, and side effects off read paths.
-
----
-
-## Features
-
-### Application core
-- MediatR registration (`AddCore`)
-- FluentValidation pipeline (`RequestValidationBehavior`)
-- Structured request logging (`LoggingBehavior`)
-- Centralized exception middleware (`UseCoreMiddlewares`)
-- Custom exceptions mapped to HTTP status codes
-
-### Domain & data (Contracts + Core)
-- `Result<T>` / `Error` functional errors
-- Entity base types (`Entity`, `AuditableEntity`, `SoftDeletableEntity`)
-- Value objects (`Email`, `PhoneNumber`, `Money`, `Address`, `DateRange`)
-- Specification pattern + `EfGenericRepository` / `EfUnitOfWork`
-- Domain event contracts
-
-### Infrastructure
-- JWT authentication helpers
-- RabbitMQ integration
-- Redis caching (`AddRedisCaching`)
-- Health checks (`AddCoreHealthChecks`, `AddDatabaseHealthCheck<TDbContext>`, `AddRedisHealthCheck`)
-- IP rate limiting (`UseRateLimiting`)
-
-### Monetization primitives (optional, compose as needed)
-- API key authentication (`AddMistrunaApiKeyAuthentication`)
-- Plan-based authorization with HTTP 402 (`AddMistrunaPlanAuthorization`, `[RequiresPlan]`)
-- Tiered rate limiting (`AddMistrunaTieredRateLimiting`, `UseTieredRateLimiting`)
-- Idempotency middleware (`AddMistrunaIdempotency`, `UseIdempotency`)
-- Usage metering (`AddMistrunaUsageMetering`, `UseUsageMetering`)
-
-### Testing helpers
-- `TestAsyncQueryProvider<T>` / `TestAsyncEnumerable<T>` — async EF Core repository tests without a database
-
----
-
-## Exception handling
-
-`UseCoreMiddlewares()` maps exceptions to HTTP responses:
-
-| Exception | Status |
-|-----------|--------|
-| `ValidationException` | 400 |
-| `NotFoundException` | 404 |
-| `UnauthorizedAccessException` | 401 |
-| `ForbiddenAccessException` | 403 |
-| `ConflictException` | 409 |
-| `TimeoutException` | 408 |
-
----
-
-## Health checks
-
-```csharp
-builder.Services
-    .AddCoreHealthChecks(builder => builder
-        .AddDatabaseHealthCheck<AppDbContext>()
-        .AddRedisHealthCheck());
-```
-
----
-
-## Building from source
-
-**Prerequisites:** [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+## Samples
 
 ```powershell
-./Build.ps1          # build, test, pack
-./BuildContracts.ps1 # contracts package only
-./Push.ps1 -ApiKey "your-api-key"
+dotnet run --project samples/Mistruna.Core.Samples.BasicApi
+dotnet run --project samples/Mistruna.Core.Samples.WorkerRabbit
+dotnet run --project samples/Mistruna.Core.Samples.ApiWithOtel
 ```
 
-Place the NuGet icon at `assets/logo/mistruna_128x128.png` before publishing packages (optional for local builds).
+The RabbitMQ sample requires a broker. See [samples/README.md](samples/README.md) for configuration.
 
----
+## Build
 
-## Project structure
+Prerequisite: [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 
-```
-Mistruna.Core/
-├── src/
-│   ├── Mistruna.Core/              # Main SDK
-│   │   ├── Abstractions/           # ICommand, IQuery, RequestKind
-│   │   ├── Authentication/         # API key auth
-│   │   ├── Authorization/          # Plan-based authorization
-│   │   ├── Base/                   # EF repository helpers
-│   │   ├── Extensions/             # DI and middleware registration
-│   │   ├── Filters/                # MediatR pipeline behaviors
-│   │   ├── HealthChecks/           # DB / Redis health checks
-│   │   ├── Idempotency/            # Idempotency middleware
-│   │   ├── Metering/               # Usage metering
-│   │   ├── Microservices/          # JWT, RabbitMQ, Swagger
-│   │   ├── Middlewares/            # Exception handling
-│   │   ├── Providers/              # EF async test helpers
-│   │   └── RateLimiting/           # IP + tiered rate limits
-│   └── Mistruna.Core.Contracts/    # Shared contracts
-├── test/Mistruna.Core.Tests/
-├── samples/Mistruna.Core.Samples.BasicApi/
-└── assets/logo/                    # Package icon (add before publish)
+```powershell
+dotnet format --verify-no-changes
+dotnet test
+dotnet pack --configuration Release --output ./artifacts
 ```
 
----
+`./Build.ps1` runs restore, build, test, and pack. Packages are written to `artifacts/`.
 
 ## Contributing
 

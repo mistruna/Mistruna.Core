@@ -1,5 +1,5 @@
 using MediatR;
-using Mistruna.Core.Abstractions;
+using Mistruna.Core.Abstractions.Cqrs;
 
 namespace Mistruna.Core.Samples.BasicApi.Features.Ping;
 

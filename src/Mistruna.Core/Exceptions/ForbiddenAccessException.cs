@@ -1,4 +1,4 @@
-﻿namespace Mistruna.Core.Exceptions;
+namespace Mistruna.Core.Exceptions;
 
 /// <summary>
 /// Exception thrown when the user is authenticated but lacks the required permissions.

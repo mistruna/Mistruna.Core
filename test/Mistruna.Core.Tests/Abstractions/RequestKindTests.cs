@@ -1,4 +1,4 @@
-using Mistruna.Core.Abstractions;
+using Mistruna.Core.Abstractions.Cqrs;
 using Xunit;
 
 namespace Mistruna.Core.Tests.Abstractions;

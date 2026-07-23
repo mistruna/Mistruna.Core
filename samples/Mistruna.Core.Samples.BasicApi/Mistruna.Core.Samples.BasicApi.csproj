@@ -14,13 +14,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Mistruna.Core.Abstractions\Mistruna.Core.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Mistruna.Core.AspNetCore\Mistruna.Core.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Mistruna.Core\Mistruna.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
-    <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.OpenApi" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
 </Project>

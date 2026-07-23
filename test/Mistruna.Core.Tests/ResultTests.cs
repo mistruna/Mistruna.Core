@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Mistruna.Core.Contracts.Base.Results;
+using Mistruna.Core.Abstractions.Results;
 using Xunit;
 
 namespace Mistruna.Core.Tests;

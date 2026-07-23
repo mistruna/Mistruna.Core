@@ -1,4 +1,4 @@
-﻿using FluentValidation.Results;
+using FluentValidation.Results;
 
 namespace Mistruna.Core.Exceptions;
 
@@ -8,7 +8,7 @@ namespace Mistruna.Core.Exceptions;
 /// </summary>
 /// <remarks>
 /// Use this exception when an entity or resource cannot be found in the database or storage.
-/// The <see cref="ExceptionHandlingMiddleware"/> will automatically convert this to an HTTP 404 response.
+/// The ASP.NET Core exception handler converts this exception to an HTTP 404 response.
 /// </remarks>
 /// <example>
 /// <code>
