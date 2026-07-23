@@ -6,8 +6,6 @@
 
 Production-oriented .NET building blocks for ASP.NET Core microservices: CQRS, validation, ProblemDetails, persistence, Redis, RabbitMQ, observability, resilience, and optional monetization primitives.
 
-Mistruna.Core v5 is a package-based redesign. Version 4 is frozen and receives no new features; see the [v5 migration guide](docs/migration-v5.md).
-
 ## Packages
 
 | Package | TFM | Responsibility |
