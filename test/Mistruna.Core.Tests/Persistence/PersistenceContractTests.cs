@@ -1,5 +1,6 @@
 using FluentAssertions;
-using Mistruna.Core.Contracts.Base.Infrastructure;
+using Mistruna.Core.Abstractions.Persistence;
+using Mistruna.Core.EfCore;
 using Xunit;
 
 namespace Mistruna.Core.Tests.Persistence;
@@ -72,6 +73,25 @@ public sealed class PersistenceContractTests
             .IsAssignableFrom(typeof(IDbTransaction))
             .Should()
             .BeTrue();
+    }
+
+    [Fact]
+    public void EfCoreRepository_ShouldImplementAbstractionsContract()
+    {
+        typeof(IGenericRepository<TestEntity>)
+            .IsAssignableFrom(typeof(EfGenericRepository<TestEntity>))
+            .Should()
+            .BeTrue();
+    }
+
+    [Fact]
+    public void EfCorePackage_ShouldNotDependOnAspNetCorePackage()
+    {
+        typeof(EfGenericRepository<>)
+            .Assembly
+            .GetReferencedAssemblies()
+            .Should()
+            .NotContain(reference => reference.Name == "Mistruna.Core.AspNetCore");
     }
 
     private sealed class TestEntity : IEntity

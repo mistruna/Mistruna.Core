@@ -1,5 +1,7 @@
 using MediatR;
-using Mistruna.Core.Extensions;
+using Mistruna.Core.AspNetCore.DependencyInjection;
+using Mistruna.Core.AspNetCore.HealthChecks;
+using Mistruna.Core.DependencyInjection;
 using Mistruna.Core.Samples.BasicApi.Features.Counter;
 using Mistruna.Core.Samples.BasicApi.Features.Ping;
 
@@ -14,14 +16,20 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddCore(typeof(Program).Assembly);
-        builder.Services.AddCoreHealthChecks();
+        builder.Services.AddMistrunaCore(options =>
+        {
+            options.RegisterAssemblies(typeof(Program).Assembly);
+            options.AddValidation();
+            options.AddLoggingBehavior();
+        });
+        builder.Services.AddMistrunaAspNetCore();
+        builder.Services.AddMistrunaHealthChecks();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
         var app = builder.Build();
 
-        app.UseCoreMiddlewares();
+        app.UseMistrunaExceptionHandler();
 
         if (app.Environment.IsDevelopment())
         {
@@ -46,7 +54,7 @@ public static class Program
 
         app.MapGet("/errors/not-found", () =>
         {
-            throw new Exceptions.NotFoundException("Sample resource not found");
+            throw new Exceptions.NotFoundException("Sample resource not found", "X.NotFound");
         });
 
         app.Run();
