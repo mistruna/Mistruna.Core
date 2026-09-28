@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="MediatR" />
     <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" VersionOverride="10.0.12" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\assets\logo\mistruna_128x128.png" Pack="true" PackagePath="" />
